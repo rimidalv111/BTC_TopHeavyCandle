@@ -1,0 +1,77 @@
+//@version=3
+
+study(title="Top Heavy Candle Overlay Custom", shorttitle="Top Heavy Candle Overlay", overlay=true)
+
+
+//ALGO for HIEKIN ASHI
+whenHighAndOpenTheSame = high == open ? 100 : 1 //for locating short top heavy
+whenLowAndOpenTheSame = low == open ? 100 : 1 //for locating long top heavy
+isHighOpenSame = high == open
+isLowOpenSame = low == open
+candleSizeInput = input(title="Candle Size Filter", type=integer, defval=125, minval=1, maxval=500)
+candleSize = candleSizeInput
+
+    // ----LONG TOP HEAVY ALGO
+fullwidth = high-low
+wickwidth = close-low
+topbodywidth = high-close //or high-close
+linelow = 0
+
+istopbodywidth50bigger = 0 //empty var
+
+if(isHighOpenSame)
+    if(topbodywidth < wickwidth)
+        if(fullwidth >= candleSize)
+            istopbodywidth50bigger := 100
+            linelow = lowest(low, 1)
+
+    
+isLongTopHeavyCandle = istopbodywidth50bigger >= 100
+
+    // ------------------------
+
+   
+    // ----SHORT TOP HEAVY ALGO
+    
+    
+fullwidthshort = high-low
+wickwidthshort = high-close
+topbodywidthshort = close-low //or high-close
+
+istopbodywidth50biggershort = 0 //empty var
+
+if(isLowOpenSame)
+    if(topbodywidthshort < wickwidthshort)
+        if(fullwidthshort >= candleSize)
+            istopbodywidth50biggershort := 100
+   
+isShortTopHeavyCandle = istopbodywidth50biggershort >= 100   
+    // -------------------------  
+  
+//=============algo end ============
+  
+
+//PLOT ALGO CHART
+    //plot(-istopbodywidth50bigger, style=histogram, linewidth=3, color = #cdc2e2)
+    //plot(istopbodywidth50biggershort, style=histogram, linewidth=3, color = #ec4079)
+
+//plot overlay
+plotshape(isLongTopHeavyCandle, style=shape.diamond, location=location.belowbar, size=size.tiny, color=#cdc2e2, title="Long Top Heavy")
+plotshape(isShortTopHeavyCandle, style=shape.diamond, location=location.abovebar, size=size.tiny, color=#ec4079, title="Short Top Heavy")
+//plot line overlay
+
+//line.new(bar_index, linelow, bar_index+100, linelow, xloc.bar_index, extend.none, colorcolor=#ec4079, width=2)
+plot(linelow, title="Short Top Heavy", color=#cdc2e2, linewidth=1, style=line, trackprice=true, transp=70, show_last=50)
+
+
+//console log
+plotchar(topbodywidth, "topbodywidth", "", location = location.top)
+plotchar(wickwidth, "wickwidth", "", location = location.top)
+plotchar(fullwidth, "fullwidth", "", location = location.top)
+
+plotchar(whenHighAndOpenTheSame, "higopenthesame", "", location = location.top)
+plotchar(whenLowAndOpenTheSame, "lowopenthesame", "", location = location.top)
+
+plotchar(istopbodywidth50bigger, "Long_TopHeavyCandle", "", location = location.top)
+plotchar(istopbodywidth50biggershort, "Short_TopHeavyCandle", "", location = location.top)
+//----------------- TopHeavy Indicator End -------------------
